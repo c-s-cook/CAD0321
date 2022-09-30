@@ -15,15 +15,15 @@
 
     <body>
     <!-- Remove this line the first time you edit this file -->
-     This is the <b>About</b> page of your Django app!
+    
     <!--Add a nav bar here -->
 
     <nav class="navbar navbar-light bg-light">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" href="#">Online Course</a>
+                <a class="navbar-brand" href="../">Online Course</a>
                 <a class="navbar-brand" href="#">About Us</a>
-                <a class="navbar-brand" href="#">Contact Us</a>
+                <a class="navbar-brand" href="../contact">Contact Us</a>
             </div>
             <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
@@ -51,11 +51,12 @@
 
 
     <!--Add "About" info here -->
-    <html>
+    
+        <p>This is the <b>About</b> page of your Django app!</p>
         <h1>
             Welcome to Best Cars dealership, home to the best cars in North America. We sell domestic and imported cars at reasonable prices.
         </h1>
-    </html>
+    
 
     </body>
 
