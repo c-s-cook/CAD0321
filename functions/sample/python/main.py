@@ -30,3 +30,10 @@ def main(dict):
         return {"error": err}
 
     return {"dbs": client.all_dbs()}
+
+
+#  using this URL for help
+#  https://pypi.org/project/ibmcloudant/#programmatic-authentication
+#
+#  and this for Auth
+#  https://cloud.ibm.com/apidocs/cloudant?code=python#programmatic-authentication

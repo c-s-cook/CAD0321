@@ -1,4 +1,5 @@
 /** Functioning as of 10/12. Still outputs an unwanted header of "entries":[ ] at the start of output.
+  * Added .filter() before map to to check & take ?state="" param. 
   *
   * main() will be run when you invoke this action
   *
@@ -32,9 +33,9 @@
              }
          }
          
-         var data1 = dbList.result.rows.filter(isState).map((row) => {
+         var dealerships = dbList.result.rows.filter(isState).map((row) => {
              return{
-                  id: row.doc.id,
+                 id: row.doc.id,
                  city: row.doc.city,
                  state: row.doc.state,
                  st: row.doc.st,
@@ -47,7 +48,7 @@
          })
          
          return { 
-             data1
+            dealerships
          };
        } catch (error) {
            return { error: error.description };
