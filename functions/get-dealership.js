@@ -26,24 +26,29 @@
          });
          
          function isState(row){
-             if(params.state && params.state == row.doc.st){
-                 return row;
-             } else if(!params.state){ 
-                 return row; 
-             }
+            if(params.dealerId && params.dealerId == row.doc.id){
+                return row;
+            } else if(params.state && params.state == row.doc.st){
+                return row;
+            } else if(!params.state && !params.dealerId){ 
+                return row; 
+            }
          }
          
          var dealerships = dbList.result.rows.filter(isState).map((row) => {
-             return{
-                 id: row.doc.id,
-                 city: row.doc.city,
-                 state: row.doc.state,
-                 st: row.doc.st,
-                 address: row.doc.address,
-                 zip: row.doc.zip,
-                 lat: row.doc.lat,
-                 long: row.doc.long,
-              }
+            return{
+                row
+                /*
+                id: row.doc.id,
+                city: row.doc.city,
+                state: row.doc.state,
+                st: row.doc.st,
+                address: row.doc.address,
+                zip: row.doc.zip,
+                lat: row.doc.lat,
+                long: row.doc.long,
+                */
+             }
              
          })
          
