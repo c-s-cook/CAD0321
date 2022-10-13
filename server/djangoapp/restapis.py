@@ -37,7 +37,7 @@ def get_request(url, **kwargs):
 
 def get_dealers_from_cf(url, **kwargs):
     results = []
-    json_result = get_request(url)
+    json_result = get_request(url, **kwargs)
     if json_result:
         dealers = json_result["dealerships"]
 
@@ -57,6 +57,19 @@ def get_dealers_from_cf(url, **kwargs):
             results.append(dealer_obj)
     
     return results
+
+def get_dealer_by_id(url, dealerId):
+    results = get_dealers_from_cf(url, dealerId=dealerId)
+    
+    return results
+
+def get_dealers_by_state(url, state):
+    ## "state" needs to be the 2-letter abbr. of the state for the CFunct to return values
+    results = get_dealers_from_cf(url, state=state)
+    
+    return results
+
+
 
 
 
