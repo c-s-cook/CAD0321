@@ -6,13 +6,15 @@
 #
 # @return The output of this action, which must be a JSON object.
 #
+# requires a 'dealerId' int param to be submitted
+#
 #
 import sys
 from ibmcloudant.cloudant_v1 import CloudantV1
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibm_cloud_sdk_core import ApiException
 from requests import RequestException
-import json
+#import json
 
 
 
@@ -21,23 +23,34 @@ def main(dict):
     authenticator = IAMAuthenticator(dict["CLOUDANT_API_KEY"])
     service = CloudantV1(authenticator=authenticator)
     service.set_service_url(dict["CLOUDANT_URL"])
-    
-    #service = CloudantV1.new_instance()
-    
+        
     try:
-        response = service.post_all_docs(
-              db='reviews',
-              include_docs=True
+        # response1 = service.post_all_docs(
+        #      db='reviews',
+        #      include_docs=True
+        #    ).get_result()
+
+        response = service.post_find(
+                db='reviews',
+                selector={'dealership': {'$eq': int(dict['dealerId'])}},
             ).get_result()
+        
+        result= {
+            'headers': {'Content-Type':'application/json'}, 
+            'body': {'data':response} 
+            }
+        return result
+
     except ApiException as ae:
         return { "error": ae.messsage }
     except RequestException as err:
         return { "error": err }
-    
-    reviews = []
-    
 
-    
+
+
+
+    # reviews = []
+        
     ### FOR loop to filter 'response' down to be only those reviews with the submitted 'dealerId'
     ###     >>> Requires a k:v param of 'dealerId' to have been passed with GET, or attached in testing
     ###
@@ -62,8 +75,8 @@ def main(dict):
     ### var for shortened testing /within/ FOR Loop...
     # i = 0
     
-    for row in response["rows"]:
-        
+    # for row in response["rows"]:
+    
         ### ...Testing access to variables:
         ###     > row["doc"]["dealership"]
         ###     > dict['dealerId']
@@ -73,14 +86,16 @@ def main(dict):
         ###
         ### >>> Successfully accesses / prints out the values of both variable without throwing any errors...so, WTF?
         
-        if row["doc"]["dealership"] == dict['dealerId']:
-            reviews.append(row["doc"])
-        reviews.append(row["doc"])
+    #    if row["doc"]["dealership"] == dict['dealerId']:
+    #        reviews.append(row["doc"])
+    #    reviews.append(row["doc"])
 
 
 
-    reviews_json = json.dumps(reviews)    
-        
+    # reviews_json = json.dumps(reviews)    
+
+'''        
     return {
         "reviews": reviews_json
     }
+'''
