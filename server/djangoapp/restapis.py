@@ -3,6 +3,10 @@ import json
 # import related models here
 from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 # Create a `get_request` to make HTTP GET requests
@@ -11,15 +15,33 @@ from requests.auth import HTTPBasicAuth
 
 
 def get_request(url, **kwargs):
-    print(kwargs)
-    print("GET from {} ".format(url))
+    #print("get_request() kwargs = ", kwargs)
+    #print("GET from {} ".format(url))
+    
     try:
-        response = requests.get(url, headers={'Content-Type': 'application/json'}, params=kwargs)
+        if "api_key" in kwargs:
+            ###  Basic authentication GET
+            print('restapis.py >> within get_request() "if api_key"...')
+            response = requests.get(
+                url,
+                params=kwargs, 
+                headers={'Content-Type': 'application/json'}, 
+                auth=HTTPBasicAuth('apikey', kwargs["api_key"])
+            )
+        else:
+            ###  no authentication GET
+            #print('restapis.py >> within get_request ELSE...')
+            response = requests.get(
+                url,
+                params=kwargs, 
+                headers={'Content-Type': 'application/json'}, 
+            )
     except:
         # If any error occurs
-        print("Network exception occured")
-    status_code = response.status_code
-    print("With status {}".format(status_code))
+        print("Network exception occured in get_request()")
+        status_code = response.status_code
+        print("With status {}".format(status_code))
+
     json_data = json.loads(response.text)
     return json_data
 
@@ -75,26 +97,43 @@ def get_dealers_by_state(url, state):
 # - Call get_request() with specified arguments
 # - Parse JSON results into a DealerReview object list
 
-def get_dealer_reviews_from_cf(url, dealerId=dealer_id):
+def get_dealer_reviews_from_cf(dealerId):
     results = []
-    json_result = get_request(url, dealerId=dealerId)
+    get_review_url = os.getenv('get_review_url')
+    json_result = get_request(get_review_url, dealerId=dealerId)
     if json_result:
-        reviews = json_result["docs"]
+        reviews = json_result["data"]["docs"]
 
         for review_doc in reviews:
             doc = review_doc
+            
+            if not "purchase_date" in doc.keys():
+                doc["purchase_date"] = None
+                
+            if not "car_make" in doc.keys():
+                doc["car_make"] = None
+
+            if not "car_model" in doc.keys():
+                doc["car_model"] = None
+
+            if not "car_year" in doc.keys():
+                doc["car_year"] = None
+
             review_obj = DealerReview(
                 dealership = doc["dealership"],
                 name = doc["name"],
-                purcahse = doc["purchase"],
+                purchase = doc["purchase"],
                 review = doc["review"],
+                id = doc["id"],
                 purchase_date = doc["purchase_date"],
                 car_make = doc["car_make"],
                 car_model = doc["car_model"],
                 car_year = doc["car_year"],
-                id = doc["id"]
+                sentiment = None
             )
+            review_obj.sentiment = analyze_review_sentiments(review_obj.review)
             results.append(review_obj)
+            
     
     return results
 
@@ -105,6 +144,46 @@ def get_dealer_reviews_from_cf(url, dealerId=dealer_id):
 # def analyze_review_sentiments(text):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
+
+def analyze_review_sentiments(dealerreview):
+    nlu_url = os.getenv('nlu_url')
+    nlu_api_key = os.getenv('nlu_api_key')
+
+    params = dict()
+    params["text"] = dealerreview
+    params["version"] = "2022-04-07"
+    params["features"] = "sentiment"
+    params["return_analyzed_text"] = False
+
+
+    try:
+        response = requests.get(
+                    nlu_url,
+                    params=params,
+                    headers={
+                        'Content-Type': 'application/json', 
+                        #'apikey': api_key
+                        },
+                    auth=HTTPBasicAuth('apikey', nlu_api_key)
+                    )
+    except:
+        # If any error occurs
+        print("Network exception occured in get_request()")
+        status_code = response.status_code
+        print("With status {}".format(status_code))
+
+    results = json.loads(response.text)
+    print("results = ", results)
+
+
+    if "keywords" in results:
+        sentiment = results["keywords"]["sentiment"]["score"]
+        print('sentiment = ', sentiment)
+    else:
+        sentiment = None
+    
+    return sentiment 
+
 
 
 
