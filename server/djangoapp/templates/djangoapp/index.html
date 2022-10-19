@@ -19,7 +19,7 @@
     <nav class="navbar navbar-light bg-light">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" href="#">Dealership Reviews</a>
+                <a class="navbar-brand" href="#"><strong>Dealerships</strong></a>
                 <a class="navbar-brand" href="./about">About Us</a>
                 <a class="navbar-brand" href="./contact">Contact Us</a>
             </div>
@@ -47,19 +47,53 @@
     </nav>
 
     <div class="container-fluid">
-        <div class="deck">
-            <div class="card">
-                What a body!
+        <div class="row">
+            <div class="col-md m-4">
+
+                <table class="table" id="table" data-filter-control="true">
+                    <thead>
+                        <tr>
+                            <th data-field="id">ID</th>
+                            <th data-field="name">Dealer Name</th>
+                            <th data-field="city">City</th>
+                            <th data-field="address">Address</th>
+                            <th data-field="zip">ZIP</th>
+                            <th data-field="state" data-filter-control="select">State</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dealer in dealerships %}
+                            <tr>
+                                <td>{{ dealer.id }}</td>
+                                <td><a href="{% url 'djangoapp:dealer_details' dealer.id %}">{{ dealer.full_name }}</a></td>
+                                <td>{{ dealer.city }}</td>
+                                <td>{{ dealer.address }}</td>
+                                <td>{{ dealer.zip }}</td>
+                                <td>{{ dealer.st }}</td>
+
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
             </div>
-            <div class="card">
-                We've got all the cars you need.
+        </div>
+        <div class="row">
+            <div class="col-md">
+
             </div>
-            
         </div>
     </div>
 
-    <!--Add a dealer table here -->
+    <nav class="navbar bottom navbar-light bg-light">
+        <a class="navbar-brand" href="#">Fixed bottom</a>
+    </nav>
 
     </body>
+    <script>
+        $(function() {
+          $('#table').bootstrapTable()
+        })
+      </script>
 
 </html>

@@ -21,9 +21,9 @@
     <nav class="navbar navbar-light bg-light">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" href="../">Dealership Reviews</a>
+                <a class="navbar-brand" href="../">Dealerships</a>
                 <a class="navbar-brand" href="../about">About Us</a>
-                <a class="navbar-brand" href="#">Contact Us</a>
+                <a class="navbar-brand" href="#"><strong>Contact Us</strong></a>
             </div>
             <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
@@ -51,7 +51,15 @@
 
 
     <!--Add CONTACT content here -->
-    This is the <b>CONTACT</b> page of your Django app!
+    <div class="container mt-4 align-items-center">
+        <div class="row-md align-items-center">
+            <div class="col text-center">
+                <p>We would love to get you in the right vehicle!</p>
+                <p>Please send cash, along with a self-addressed, stamped envelope, to any of our dealerships and they will mail you back your purchase receipt. You can then pick up your incredible new car at a time that fits your schedule best.</p>
+
+            </div>
+        </div>
+    </div>
 
 
     </body>

@@ -3,6 +3,11 @@ import json
 # import related models here
 from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+from ibm_watson import NaturalLanguageUnderstandingV1
+from ibm_watson.natural_language_understanding_v1 import Features,SentimentOptions, KeywordsOptions
+import time
+
 import os
 from dotenv import load_dotenv
 
@@ -49,6 +54,11 @@ def get_request(url, **kwargs):
 
 # Create a `post_request` to make HTTP POST requests
 # e.g., response = requests.post(url, params=kwargs, json=payload)
+def post_request(url, json_payload, **kwargs):
+
+    response = requests.post(url, params=kwargs, json=json_payload)
+
+    return response
 
 
 # Create a get_dealers_from_cf method to get dealers from a cloud function
@@ -86,7 +96,7 @@ def get_dealer_by_id(url, dealerId):
     return results
 
 def get_dealers_by_state(url, state):
-    ## "state" needs to be the 2-letter abbr. of the state for the CFunct to return values
+    ###  "state" needs to be the 2-letter abbr. of the state for the CFunct to return values
     results = get_dealers_from_cf(url, state=state)
     
     return results
@@ -129,9 +139,10 @@ def get_dealer_reviews_from_cf(dealerId):
                 car_make = doc["car_make"],
                 car_model = doc["car_model"],
                 car_year = doc["car_year"],
-                sentiment = None
+                sentiment = {}
             )
             review_obj.sentiment = analyze_review_sentiments(review_obj.review)
+            # print("sentiment label >>", review_obj.sentiment['label'])
             results.append(review_obj)
             
     
@@ -149,6 +160,21 @@ def analyze_review_sentiments(dealerreview):
     nlu_url = os.getenv('nlu_url')
     nlu_api_key = os.getenv('nlu_api_key')
 
+    authenticator = IAMAuthenticator(nlu_api_key)
+    natural_language_understanding = NaturalLanguageUnderstandingV1(
+        version='2022-04-07',
+        authenticator=authenticator)
+
+    natural_language_understanding.set_service_url(nlu_url)
+
+    response = natural_language_understanding.analyze(
+        text=dealerreview,
+        features=Features(
+            #entities=EntitiesOptions(emotion=True, sentiment=True, limit=2),
+            keywords=KeywordsOptions(emotion=False, sentiment=True,
+                                    limit=2))).get_result()
+
+    '''
     params = dict()
     params["text"] = dealerreview
     params["version"] = "2022-04-07"
@@ -164,7 +190,7 @@ def analyze_review_sentiments(dealerreview):
                         'Content-Type': 'application/json', 
                         #'apikey': api_key
                         },
-                    auth=HTTPBasicAuth('apikey', nlu_api_key)
+                    auth=HTTPBasicAuth('api_key', nlu_api_key)
                     )
     except:
         # If any error occurs
@@ -172,15 +198,20 @@ def analyze_review_sentiments(dealerreview):
         status_code = response.status_code
         print("With status {}".format(status_code))
 
-    results = json.loads(response.text)
-    print("results = ", results)
+    results = json.loads(response)
 
+    '''
 
-    if "keywords" in results:
-        sentiment = results["keywords"]["sentiment"]["score"]
-        print('sentiment = ', sentiment)
+    
+    #print("response keys: ", response["keywords"][0]["sentiment"])
+    
+
+    if "keywords" in response:
+        ###  assigns 'sentiment' a <dict> value with keys: 'score': <int>, 'label': <str>
+        sentiment = response["keywords"][0]["sentiment"]
+                
     else:
-        sentiment = None
+        sentiment = {}
     
     return sentiment 
 
