@@ -141,7 +141,7 @@ def get_dealer_details(request, dealer_id):
         context["dealer_id"] = dealer_id
         context["reviews"] = dealer_reviews
         context['dealer'] = dealership[0]
-        context['maps_api_key'] = os.getenv('maps_api_key')
+        #context['maps_api_key'] = os.getenv('maps_api_key')
 
         #reviews = ' <p> '.join([dealer_reviews[0].review for review in dealer_reviews])
 
@@ -178,7 +178,7 @@ def add_review(request, dealer_id):
 
         post_review_url = os.getenv("post_review_url")
 
-        car = get_object_or_404(CarModel, pk=request.POST["car"])
+        
 
         review = {}
         review["time"] = datetime.utcnow().isoformat()
@@ -186,14 +186,17 @@ def add_review(request, dealer_id):
         review["dealership"] = dealer_id
         review["review"] = request.POST["review"]
         review["name"] = user.first_name + " " + user.last_name
-        review["car_year"] = car.year.strftime("%Y")
-        review["car_make"] = car.make.name
-        review["car_model"] = car.name
-        if request.POST["purchasecheck"] == 'on':
+        
+        if "purchasecheck" in request.POST:
             review["purchase"] = True
+            car = get_object_or_404(CarModel, pk=request.POST["car"])
+            review["car_year"] = car.year.strftime("%Y")
+            review["car_make"] = car.make.name
+            review["car_model"] = car.name
+            review["purchase_date"] = request.POST["purchasedate"]
         else:
             review["purchase"] = False
-        review["purchase_date"] = request.POST["purchasedate"]
+        
 
        
         json_payload = {}

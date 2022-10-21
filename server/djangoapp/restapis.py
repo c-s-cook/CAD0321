@@ -141,6 +141,7 @@ def get_dealer_reviews_from_cf(dealerId):
                 car_year = doc["car_year"],
                 sentiment = {}
             )
+            
             review_obj.sentiment = analyze_review_sentiments(review_obj.review)
             # print("sentiment label >>", review_obj.sentiment['label'])
             results.append(review_obj)
@@ -167,12 +168,16 @@ def analyze_review_sentiments(dealerreview):
 
     natural_language_understanding.set_service_url(nlu_url)
 
-    response = natural_language_understanding.analyze(
-        text=dealerreview,
-        features=Features(
-            #entities=EntitiesOptions(emotion=True, sentiment=True, limit=2),
-            keywords=KeywordsOptions(emotion=False, sentiment=True,
-                                    limit=2))).get_result()
+    try:
+        print("in TRY of analyze >> dealerreview = ", dealerreview)
+        response = natural_language_understanding.analyze(
+            text=dealerreview,
+            features=Features(
+                #entities=EntitiesOptions(emotion=True, sentiment=True, limit=2),
+                keywords=KeywordsOptions(emotion=False, sentiment=True,
+                                        limit=2))).get_result()
+    except:
+        print("analyze_review_sentiments Error >> ", response)
 
     '''
     params = dict()
@@ -206,12 +211,16 @@ def analyze_review_sentiments(dealerreview):
     #print("response keys: ", response["keywords"][0]["sentiment"])
     
 
-    if "keywords" in response:
+    if ("keywords" in response) & (len(response["keywords"]) > 0):
+        print("response['keywords'] = ", response["keywords"])
+
         ###  assigns 'sentiment' a <dict> value with keys: 'score': <int>, 'label': <str>
-        sentiment = response["keywords"][0]["sentiment"]
+        sentiment = response["keywords"][1]["sentiment"]
                 
     else:
         sentiment = {}
+        sentiment["score"] = 0
+        sentiment["label"] = "neutral"
     
     return sentiment 
 

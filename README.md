@@ -34,4 +34,5 @@ You must complete all the labs to successfully complete the project.
 
 **Containerize your application**
 1. Add deployment artifacts to your application
+        https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-CD0321EN-SkillsNetwork/labs/module_5_containerize/1-instructional-labs-theia-containerize.md.html
 2. Deploy your application
