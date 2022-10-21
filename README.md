@@ -25,6 +25,7 @@ You must complete all the labs to successfully complete the project.
 1. ?  Create cloud functions to manage dealers and reviews
 2. X  Create Django models and views to manage car model and car make
 3. Create Django proxy services and views to integrate dealers, reviews, and cars together
+        https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-CD0321EN-SkillsNetwork/labs/module_3_backend_services/3-instructional-labs-theia-django-proxy.md.html
  
 **Add dynamic pages with Django templates**
 1. Create a page that shows all the dealers

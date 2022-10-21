@@ -22,7 +22,7 @@ def main(dict):
     service = CloudantV1(authenticator=authenticator)
     service.set_service_url(dict["CLOUDANT_URL"])
     
-    
+    '''
     review_doc = Document(
         ID=dict["id"],
         name=dict["name"],
@@ -35,12 +35,12 @@ def main(dict):
         car_model=dict["car_model"],
         car_year=dict["car_year"]
         )
-
+    '''
     
     try:
         review = service.post_document(
               db='reviews',
-              document=review_doc
+              document=dict["review"]
             ).get_result()
             
     except ApiException as ae:
