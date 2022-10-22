@@ -4,7 +4,7 @@ import json
 from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
-from ibm_watson import NaturalLanguageUnderstandingV1
+from ibm_watson import NaturalLanguageUnderstandingV1, ApiException
 from ibm_watson.natural_language_understanding_v1 import Features,SentimentOptions, KeywordsOptions
 import time
 
@@ -176,8 +176,13 @@ def analyze_review_sentiments(dealerreview):
                 #entities=EntitiesOptions(emotion=True, sentiment=True, limit=2),
                 keywords=KeywordsOptions(emotion=False, sentiment=True,
                                         limit=2))).get_result()
-    except:
+    except ApiException as ex:
+        response = ex
         print("analyze_review_sentiments Error >> ", response)
+        sentiment = {}
+        sentiment["score"] = 0
+        sentiment["label"] = "neutral"
+        return sentiment
 
     '''
     params = dict()
@@ -215,7 +220,7 @@ def analyze_review_sentiments(dealerreview):
         print("response['keywords'] = ", response["keywords"])
 
         ###  assigns 'sentiment' a <dict> value with keys: 'score': <int>, 'label': <str>
-        sentiment = response["keywords"][1]["sentiment"]
+        sentiment = response["keywords"][0]["sentiment"]
                 
     else:
         sentiment = {}
