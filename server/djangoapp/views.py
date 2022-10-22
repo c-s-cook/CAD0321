@@ -188,13 +188,19 @@ def add_review(request, dealer_id):
         review["name"] = user.first_name + " " + user.last_name
         
         if "purchasecheck" in request.POST:
+            print("yes, they checked the box")
             review["purchase"] = True
-            car = get_object_or_404(CarModel, pk=request.POST["car"])
-            review["car_year"] = car.year.strftime("%Y")
-            review["car_make"] = car.make.name
-            review["car_model"] = car.name
-            review["purchase_date"] = request.POST["purchasedate"]
+            print("POST's 'car' = ", request.POST["car"])
+            if ("car" in request.POST) & (request.POST["car"] != "none"):
+                print("Yes, there was a car submitted. It was >>> ", request.POST["car"])
+                car = get_object_or_404(CarModel, pk=request.POST["car"])
+                review["car_year"] = car.year.strftime("%Y")
+                review["car_make"] = car.make.name
+                review["car_model"] = car.name
+            if "purchasedate" in request.POST:
+                review["purchase_date"] = request.POST["purchasedate"]
         else:
+            print("No, they didn't check the box.")
             review["purchase"] = False
         
 
