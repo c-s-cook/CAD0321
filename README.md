@@ -1,4 +1,37 @@
 
+## DJANGO CMDS
+- python manage.py runserver
+
+
+
+## PYTHON VIRTUAL ENVIRONMENT
+
+ > Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process
+
+*** to make ***
+> python -mvenv [name]
+
+*** to activate ***
+>.\[name]\Scripts\activate
+
+*** to deactivate ***
+> deactivate
+
+
+## DEPLOYMENT TUTS:
+- https://stackabuse.com/deploying-django-apps-to-heroku-from-github/
+
+
+
+
+<br><br>
+
+
+
+
+
+
+
 Cloud Foundry link:
         https://cad0321.us-south.cf.appdomain.cloud/djangoapp/
 

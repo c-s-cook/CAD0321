@@ -189,11 +189,13 @@ def add_review(request, dealer_id):
         
         if "purchasecheck" in request.POST:
             review["purchase"] = True
-            car = get_object_or_404(CarModel, pk=request.POST["car"])
-            review["car_year"] = car.year.strftime("%Y")
-            review["car_make"] = car.make.name
-            review["car_model"] = car.name
-            review["purchase_date"] = request.POST["purchasedate"]
+            if "car" in request.POST:
+                car = get_object_or_404(CarModel, pk=request.POST["car"])
+                review["car_year"] = car.year.strftime("%Y")
+                review["car_make"] = car.make.name
+                review["car_model"] = car.name
+            if "purchasedate" in request.POST:
+                review["purchase_date"] = request.POST["purchasedate"]
         else:
             review["purchase"] = False
         
