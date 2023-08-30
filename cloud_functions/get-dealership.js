@@ -1,4 +1,4 @@
-/** Functioning as of 10/12. Still outputs an unwanted header of "entries":[ ] at the start of output.
+/** 
   * Added .filter() before map to to check & take ?state="" param. 
   *
   * main() will be run when you invoke this action
@@ -8,6 +8,7 @@
   * @return The output of this action, which must be a JSON object.
   *
   */
+
  const { CloudantV1 } = require('@ibm-cloud/cloudant');
  const { IamAuthenticator } = require('ibm-cloud-sdk-core');
  
@@ -20,7 +21,7 @@
        cloudant.setServiceUrl(params.COUCH_URL);
        
        try {
-                 let dbList = await cloudant.postAllDocs({
+            let dbList = await cloudant.postAllDocs({
              db: 'dealerships',
              includeDocs: true,
          });
@@ -38,16 +39,6 @@
          var dealerships = dbList.result.rows.filter(isState).map((row) => {
             return{
                 row
-                /*
-                id: row.doc.id,
-                city: row.doc.city,
-                state: row.doc.state,
-                st: row.doc.st,
-                address: row.doc.address,
-                zip: row.doc.zip,
-                lat: row.doc.lat,
-                long: row.doc.long,
-                */
              }
              
          })

@@ -1,10 +1,48 @@
+# ABOUT
+This is a project from my Full Stack Cloud Application Development certification, but **this is primarily a *backend* project**. (The frontend sure ain't purtty.)
 
-## DJANGO CMDS
-- python manage.py runserver
+**CLOUD FUNCTIONS**
+
+This Django app uses Cloud Function (aka 'serverless' or 'Lambda') API calls which interface with a NoSQL database in order to:
+- retrieve and dynamically generate the homepage list of Dealerships;
+- retrieve and dynamically generate pages for individual dealership details & reviews
+- post new dealership reviews from authenticated users
+
+**WATSON NATURAL LANGUAGE UNDERSTANDING**
+
+The app also utilizes the Watson NLU SDK to analyze the sentiment of each review that is submitted and correlate the results to how the review is displayed on the dealership details page.
+
+**AUTHENTICATION / AUTHORIZATION**
+
+The app uses an SQLite database with Django's built-in Admin site and functionality for authenticating and authorizing users. 
 
 
 
-## PYTHON VIRTUAL ENVIRONMENT
+
+<br/><br/>
+
+# INSTALLATION
+1. Download & unzip
+2. >  cd  [ directory name ]
+3. Upload the starter data found in the './NoSQL' folder to a NoSQL database of your choice.
+4. Create three Cloud Functions on the platform of your choice (refactor code as needed) and provide each necessary connection URLs & Keys to your database
+5. Create a Free Tier instance of the Watson NLU service on IBM Cloud.
+6. (Optional/Recommended:) create & activate a python Virtual Environment
+7. >  cd server
+8. > pip install -r requirements.txt
+9. Add your API end-points and Keys to the .env file
+10. > python manage.py runserver
+
+...That should be enough to get the front-end up and running. 
+
+
+
+
+<br/><br/><br/>
+
+
+### PYTHON VIRTUAL ENVIRONMENT SETUP
+On Windows, it may be necessary to modify the Execution Policy in your PowerShell/cmd prompt to allow bash scripts to be run. The below command will allow the current terminal session to do just that.
 
  > Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process
 
@@ -18,6 +56,7 @@
 > deactivate
 
 
+<br/> <br/>
 ## DEPLOYMENT TUTS:
 - https://stackabuse.com/deploying-django-apps-to-heroku-from-github/
 
@@ -31,19 +70,12 @@
 
 
 
+## FINAL PROJECT REQUIREMENTS
 
-Cloud Foundry link:
-        https://cad0321.us-south.cf.appdomain.cloud/djangoapp/
+The final project for this course had several steps that I had to complete. 
+All the high-level steps are listed below. 
 
 
-# Final Project Template
-
-The final project for this course has several steps that you must complete. 
-To give you an overview of the whole project, all the high-level steps are listed below. 
-The project is then divided into several smaller labs that give the detailed instructions for each step. 
-You must complete all the labs to successfully complete the project.
-
-## Project Breakdown
 
 **Prework: Sign up for IBM Cloud account and create a Watson Natural language Understanding service**
 1. X  Create an IBM cloud account if you don't have one already.
@@ -60,17 +92,17 @@ You must complete all the labs to successfully complete the project.
 2. X  Set up continuous integration and delivery
 
 **Implement backend services**
-1. ?  Create cloud functions to manage dealers and reviews
+1. X  Create cloud functions to manage dealers and reviews
 2. X  Create Django models and views to manage car model and car make
 3. Create Django proxy services and views to integrate dealers, reviews, and cars together
         https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-CD0321EN-SkillsNetwork/labs/module_3_backend_services/3-instructional-labs-theia-django-proxy.md.html
  
 **Add dynamic pages with Django templates**
-1. Create a page that shows all the dealers
-2. Create a page that show reviews for a selected dealer
-3. Create a page that let's the end user add a review for a selected dealer
+1. X Create a page that shows all the dealers
+2. X Create a page that show reviews for a selected dealer
+3. X Create a page that let's the end user add a review for a selected dealer
 
 **Containerize your application**
-1. Add deployment artifacts to your application
+1. X Add deployment artifacts to your application
         https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-CD0321EN-SkillsNetwork/labs/module_5_containerize/1-instructional-labs-theia-containerize.md.html
 2. Deploy your application

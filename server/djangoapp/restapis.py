@@ -1,23 +1,27 @@
 import requests
 import json
-# import related models here
+import time
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+# importing Django models
 from .models import CarDealer, DealerReview
+
+# importing IBM Cloud / Watson modules
 from requests.auth import HTTPBasicAuth
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibm_watson import NaturalLanguageUnderstandingV1, ApiException
 from ibm_watson.natural_language_understanding_v1 import Features,SentimentOptions, KeywordsOptions
-import time
-
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
-# Create a `get_request` to make HTTP GET requests
-# e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
-#                                     auth=HTTPBasicAuth('apikey', api_key))
 
+#
+#   get_request():
+#       - reusable method to make HTTP GET requests
+#       - e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
+#                                         auth=HTTPBasicAuth('apikey', api_key))
+#
 
 def get_request(url, **kwargs):
     #print("get_request() kwargs = ", kwargs)
@@ -52,8 +56,12 @@ def get_request(url, **kwargs):
 
 
 
-# Create a `post_request` to make HTTP POST requests
-# e.g., response = requests.post(url, params=kwargs, json=payload)
+#
+#   post_request():
+#       - resuable method to make HTTP POST requests
+#       - e.g., response = requests.post(url, params=kwargs, json=payload)
+#
+
 def post_request(url, json_payload, **kwargs):
 
     response = requests.post(url, params=kwargs, json=json_payload)
@@ -61,11 +69,13 @@ def post_request(url, json_payload, **kwargs):
     return response
 
 
-# Create a get_dealers_from_cf method to get dealers from a cloud function
-# def get_dealers_from_cf(url, **kwargs):
-# - Call get_request() with specified arguments
-# - Parse JSON results into a CarDealer object list
 
+# 
+#   get_dealers_from_cf():
+#       - method to get dealers from a cloud function
+#       - calls get_request() with specified arguments
+#       - parses JSON results into a CarDealer object list
+#
 
 def get_dealers_from_cf(url, **kwargs):
     results = []
@@ -90,26 +100,41 @@ def get_dealers_from_cf(url, **kwargs):
     
     return results
 
+
+
+#
+#   get_dealer_by_id():
+#
+
 def get_dealer_by_id(url, dealerId):
     results = get_dealers_from_cf(url, dealerId=dealerId)
     
     return results
 
+
+
+#
+#   get_dealers_by_state():
+#
+
 def get_dealers_by_state(url, state):
-    ###  "state" needs to be the 2-letter abbr. of the state for the CFunct to return values
+    ###  "state" needs to be the 2-letter abbr. of the state for the Cloud Function to return values
     results = get_dealers_from_cf(url, state=state)
     
     return results
 
 
-# Create a get_dealer_reviews_from_cf method to get reviews by dealer id from a cloud function
-# def get_dealer_by_id_from_cf(url, dealerId):
-# - Call get_request() with specified arguments
-# - Parse JSON results into a DealerReview object list
+
+#
+#   get_dealer_by_id_from_cf(dealerId):
+#       - method to get reviews by dealer id from a cloud function
+#       - calls the get_request() with specified arguments
+#       - parses JSON results into a DealerReview object list
+#
 
 def get_dealer_reviews_from_cf(dealerId):
     results = []
-    get_review_url = os.getenv('get_review_url')
+    get_review_url = os.getenv('GET_REVIEW_API')
     json_result = get_request(get_review_url, dealerId=dealerId)
     if json_result:
         reviews = json_result["data"]["docs"]
@@ -151,15 +176,15 @@ def get_dealer_reviews_from_cf(dealerId):
 
 
 
-
-# Create an `analyze_review_sentiments` method to call Watson NLU and analyze text
-# def analyze_review_sentiments(text):
-# - Call get_request() with specified arguments
-# - Get the returned sentiment label such as Positive or Negative
+#
+#   analyze_review_sentiments():
+#       - method calls Watson NLU instance and analyzes submitted text
+#       - Successful call returns sentiment label such as Positive, Neutral, or Negative
+#
 
 def analyze_review_sentiments(dealerreview):
-    nlu_url = os.getenv('nlu_url')
-    nlu_api_key = os.getenv('nlu_api_key')
+    nlu_url = os.getenv('NLU_API')
+    nlu_api_key = os.getenv('NLU_KEY')
 
     authenticator = IAMAuthenticator(nlu_api_key)
     natural_language_understanding = NaturalLanguageUnderstandingV1(
@@ -169,11 +194,9 @@ def analyze_review_sentiments(dealerreview):
     natural_language_understanding.set_service_url(nlu_url)
 
     try:
-        print("in TRY of analyze >> dealerreview = ", dealerreview)
         response = natural_language_understanding.analyze(
             text=dealerreview,
             features=Features(
-                #entities=EntitiesOptions(emotion=True, sentiment=True, limit=2),
                 keywords=KeywordsOptions(emotion=False, sentiment=True,
                                         limit=2))).get_result()
     except ApiException as ex:
@@ -184,40 +207,8 @@ def analyze_review_sentiments(dealerreview):
         sentiment["label"] = "neutral"
         return sentiment
 
-    '''
-    params = dict()
-    params["text"] = dealerreview
-    params["version"] = "2022-04-07"
-    params["features"] = "sentiment"
-    params["return_analyzed_text"] = False
-
-
-    try:
-        response = requests.get(
-                    nlu_url,
-                    params=params,
-                    headers={
-                        'Content-Type': 'application/json', 
-                        #'apikey': api_key
-                        },
-                    auth=HTTPBasicAuth('api_key', nlu_api_key)
-                    )
-    except:
-        # If any error occurs
-        print("Network exception occured in get_request()")
-        status_code = response.status_code
-        print("With status {}".format(status_code))
-
-    results = json.loads(response)
-
-    '''
-
-    
-    #print("response keys: ", response["keywords"][0]["sentiment"])
-    
-
     if ("keywords" in response) & (len(response["keywords"]) > 0):
-        print("response['keywords'] = ", response["keywords"])
+        #print("response['keywords'] = ", response["keywords"])
 
         ###  assigns 'sentiment' a <dict> value with keys: 'score': <int>, 'label': <str>
         sentiment = response["keywords"][0]["sentiment"]
@@ -228,7 +219,3 @@ def analyze_review_sentiments(dealerreview):
         sentiment["label"] = "neutral"
     
     return sentiment 
-
-
-
-

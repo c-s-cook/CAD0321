@@ -20,20 +20,23 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 
-# Create your views here.
+# Creating views here...
 
+#
+#   `about` view to render a static about page
+# 
 
-# Create an `about` view to render a static about page
-# def about(request):
-# ...
 def about(request):
     context = {}
     if request.method == "GET":
         return render(request, 'djangoapp/about.html', context)
 
 
-# Create a `contact` view to return a static contact page
-#def contact(request):
+
+#
+#   `contact` view to return a static contact page
+#
+
 def contact(request):
     context = {}
     if request.method == "GET":
@@ -41,10 +44,10 @@ def contact(request):
 
 
 
+#
+#   `login_request` view to handle sign in requests
+#
 
-# Create a `login_request` view to handle sign in request
-# def login_request(request):
-# ...
 def login_request(request):
     context = {}
     if request.method == "POST":
@@ -62,18 +65,20 @@ def login_request(request):
 
 
 
-# Create a `logout_request` view to handle sign out request
-# def logout_request(request):
-# ...
+#
+#   `logout_request` view to handle sign out requests
+#
+
 def logout_request(request):
     logout(request)
     return redirect('djangoapp:index')
 
 
 
-# Create a `registration_request` view to handle sign up request
-# def registration_request(request):
-# ...
+#
+#   `registration_request` view to handle sign up requests
+#
+
 def registration_request(request):
     context = {}
     if request.method == 'GET':
@@ -100,67 +105,63 @@ def registration_request(request):
             return render(request, 'djangoapp/user_registration_bootstrap.html', context)
 
 
-# Update the `get_dealerships` view to render the index page with a list of dealerships
+
+#
+# `get_dealerships` view renders the index page with a list of dealerships
+#
 
 def get_dealerships(request):
     context = {}
     if request.method == "GET":
         
-        get_dealership_url = os.getenv('get_dealership_url')
+        get_dealership_url = os.getenv('GET_DEALERSHIP_API')
         
-        #url = "https://us-south.functions.appdomain.cloud/api/v1/web/89f97b1c-5e62-40b3-b586-9642b92e5de0/dealership-package/get-dealership.json"
         if 'state' in request.GET:
-            ###  "state" needs to be the 2-letter abbr. of the state for the CFunct to return values
-            # print("there is state")
+            ###  "state" needs to be the 2-letter abbr. of the state for the cloud function to return values
             dealerships = get_dealers_by_state(get_dealership_url, request.GET['state'])
         elif 'dealerId' in request.GET:
-            # print("there is dealerId")
             dealerships = get_dealer_by_id(get_dealership_url, request.GET['dealerId'])
         else:
-            # print("made it to Else")
             dealerships = get_dealers_from_cf(get_dealership_url)
+
         context['dealerships'] = dealerships
-        #dealer_names = ' <p> '.join([dealer.short_name for dealer in dealerships])
+        
         return render(request, 'djangoapp/index.html', context)
 
 
+#
+#   `get_dealer_details` view renders the reviews of a dealer
+#
 
-# Create a `get_dealer_details` view to render the reviews of a dealer
 def get_dealer_details(request, dealer_id):
     context = {}
     if request.method == "GET":
-        get_dealership_url = os.getenv('get_dealership_url')
+        get_dealership_url = os.getenv('GET_DEALERSHIP_API')
 
         ###     expects to receive an <array> of DealerReview objects
         dealer_reviews = get_dealer_reviews_from_cf(dealerId=dealer_id)
 
         ###     expects to recieve a <list> containing 1 CarDealer obj
         dealership = get_dealer_by_id(get_dealership_url, dealer_id)
-        #print("dealerships type = ", type(dealership[0]))
 
         context["dealer_id"] = dealer_id
         context["reviews"] = dealer_reviews
         context['dealer'] = dealership[0]
-        #context['maps_api_key'] = os.getenv('maps_api_key')
-
-        #reviews = ' <p> '.join([dealer_reviews[0].review for review in dealer_reviews])
 
         return render(request, 'djangoapp/dealer_details.html', context)
 
 
 
+#
+#   `add_review` view to submit a review
+#
 
-
-
-# Create a `add_review` view to submit a review
 def add_review(request, dealer_id):
     context = {}
     
-
-
     if request.method == 'GET':
         cars = CarModel.objects.all()
-        get_dealership_url = os.getenv('get_dealership_url')
+        get_dealership_url = os.getenv('GET_DEALERSHIP_API')
         dealership = get_dealer_by_id(get_dealership_url, dealer_id)
 
         context["dealer_id"] = dealer_id
@@ -172,13 +173,8 @@ def add_review(request, dealer_id):
 
     if request.method == 'POST':
         user = request.user
-        #if user.is_authenticated:
-        #    pass
-        #else: return {}
 
-        post_review_url = os.getenv("post_review_url")
-
-        
+        post_review_url = os.getenv("POST_REVIEW_API")
 
         review = {}
         review["time"] = datetime.utcnow().isoformat()
@@ -199,8 +195,6 @@ def add_review(request, dealer_id):
         else:
             review["purchase"] = False
         
-
-       
         json_payload = {}
         json_payload["review"] = review
 
@@ -208,7 +202,6 @@ def add_review(request, dealer_id):
         print(response.text)
 
 
-    
     return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
 
 
