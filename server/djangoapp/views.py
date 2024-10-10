@@ -184,6 +184,7 @@ def add_review(request, dealer_id):
         review["name"] = user.first_name + " " + user.last_name
         
         if "purchasecheck" in request.POST:
+            print("yes, they checked the box")
             review["purchase"] = True
             if "car" in request.POST:
                 car = get_object_or_404(CarModel, pk=request.POST["car"])
@@ -193,6 +194,7 @@ def add_review(request, dealer_id):
             if "purchasedate" in request.POST:
                 review["purchase_date"] = request.POST["purchasedate"]
         else:
+            print("No, they didn't check the box.")
             review["purchase"] = False
         
         json_payload = {}
